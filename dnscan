@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use 5.010;
+use AnyEvent;
+use AnyEvent::DNS;
 use Carp;
 use Net::Netmask;
-use Socket;
 
 INIT {
     croak 'You need to specify IP range' if $#ARGV < 0;
@@ -14,10 +15,18 @@ INIT {
     foreach (@ARGV) {
         my $iprange = Net::Netmask->new($_);
 
-        foreach ($iprange->enumerate) {
-            my ($name) = gethostbyaddr inet_aton($_), AF_INET;
-            say "$_: $name" if defined $name;
+        my $cv = AnyEvent->condvar;
+        $cv->begin;
+        foreach my $ip ($iprange->enumerate) {
+            $cv->begin;
+            AnyEvent::DNS::reverse_lookup $ip, sub {
+                my $names = join ', ', @_;
+                say "$ip: $names";
+                $cv->end;
+            };
         }
+        $cv->end;
+        $cv->wait;
     }
 }
 
