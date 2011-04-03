@@ -21,7 +21,7 @@ INIT {
             $cv->begin;
             AnyEvent::DNS::reverse_lookup $ip, sub {
                 my $names = join ', ', @_;
-                say "$ip: $names";
+                say "$ip: $names" if $names;
                 $cv->end;
             };
         }
