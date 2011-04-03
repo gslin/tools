@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use Net::Netmask;
+use Socket;
+use strict;
+use warnings;
+
+main();
+
+sub main
+{
+    die 'You need to specify IP range' if $#ARGV < 0;
+
+    foreach (@ARGV) {
+        my $iprange = Net::Netmask->new($_);
+
+        foreach ($iprange->enumerate) {
+            my ($name) = gethostbyaddr inet_aton($_), AF_INET;
+            print "$_: $name\n" if defined $name;
+        }
+    }
+}
+
+__END__
