@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use 5.010;
 use Carp;
 use Net::Netmask;
 use Socket;
@@ -15,7 +16,7 @@ INIT {
 
         foreach ($iprange->enumerate) {
             my ($name) = gethostbyaddr inet_aton($_), AF_INET;
-            print "$_: $name\n" if defined $name;
+            say "$_: $name" if defined $name;
         }
     }
 }
