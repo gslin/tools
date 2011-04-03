@@ -6,10 +6,7 @@ use Socket;
 use strict;
 use warnings;
 
-main();
-
-sub main
-{
+INIT {
     croak 'You need to specify IP range' if $#ARGV < 0;
 
     foreach (@ARGV) {
